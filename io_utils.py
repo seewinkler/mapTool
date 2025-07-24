@@ -1,28 +1,34 @@
+# io_utils.py
+
 import os
 import geopandas as gpd
-from typing import Tuple, List  # Großbuchstaben!
+from typing import Tuple, List
 
-def find_gpkg_files(config: dict) -> Tuple[str, List[gpd.GeoDataFrame]]:
-    """
-    Sucht und lädt die GPKG-Dateien für Haupt- und Nebenländer.
-    Gibt zurück: (pfad_haupt_gpkg, [GeoDataFrame_nebenlaender...])
-    """
-    haupt_dir = config["pfade"]["hauptland"]
-    neben_dir = config["pfade"]["nebenlaender"]
 
-    # Erstes GPKG im Hauptverzeichnis finden
-    haupt_files = [f for f in os.listdir(haupt_dir) if f.endswith(".gpkg")]
+def find_gpkg_files(
+    hauptland_dir: str,
+    nebenlaender_dir: str,
+    nebenlayer_name: str
+) -> Tuple[str, List[gpd.GeoDataFrame]]:
+    """
+    Findet im Verzeichnis hauptland_dir die erste .gpkg-Datei
+    und lädt aus nebenlaender_dir alle .gpkg-Dateien als GeoDataFrames
+    unter Verwendung des Layers nebenlayer_name.
+    Liefert (pfad_haupt_gpkg, [gdf_neben1, gdf_neben2, ...]).
+    """
+    # Hauptland-GPKG finden
+    haupt_files = [f for f in os.listdir(hauptland_dir) if f.endswith(".gpkg")]
     if not haupt_files:
-        raise FileNotFoundError(f"Keine .gpkg im Verzeichnis {haupt_dir}")
-    haupt_path = os.path.join(haupt_dir, haupt_files[0])
+        raise FileNotFoundError(f"Keine .gpkg im Ordner {hauptland_dir}")
+    haupt_path = os.path.join(hauptland_dir, haupt_files[0])
 
-    # Alle Nebenländer-Dateien laden
-    neben_gdfs = []
-    for fname in os.listdir(neben_dir):
-        if fname.endswith(".gpkg"):
-            pfad = os.path.join(neben_dir, fname)
-            # Hier geht’s davon aus, dass in config["nebenlaender"] der Layername steht
-            gdf = gpd.read_file(pfad, layer=config["nebenlaender"])
-            neben_gdfs.append(gdf)
+    # Nebenländer laden
+    neben_gdfs: List[gpd.GeoDataFrame] = []
+    for fname in os.listdir(nebenlaender_dir):
+        if not fname.endswith(".gpkg"):
+            continue
+        pfad = os.path.join(nebenlaender_dir, fname)
+        gdf = gpd.read_file(pfad, layer=nebenlayer_name)
+        neben_gdfs.append(gdf)
 
     return haupt_path, neben_gdfs

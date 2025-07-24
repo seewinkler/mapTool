@@ -1,24 +1,83 @@
+# plotting.py
+
+import os
 import matplotlib.pyplot as plt
 from datetime import datetime
-import os
 
-def plot_map(haupt, neben_list, highlight_cfg, colors, bbox, aspect):
-    fig, ax = plt.subplots(figsize=(colors["breite"]/100, colors["hoehe"]/100), dpi=100)
-    for n in neben_list:
-        n.plot(ax=ax, color=colors["nebenland"], edgecolor=colors["grenze"])
-    haupt.plot(ax=ax, color=colors["hauptland"], edgecolor=colors["grenze"])
-    if highlight_cfg:
-        # ...
-        pass
-    ax.set_xlim(bbox[0], bbox[1]); ax.set_ylim(bbox[2], bbox[3])
+
+def plot_map(
+    haupt_gdf,
+    neben_gdfs,
+    highlight_cfg: dict,
+    colors: dict,
+    bbox: tuple,
+    width_px: int,
+    height_px: int
+):
+    """
+    Zeichnet Hauptland, Nebenländer und (optional) Highlights
+    in eine Matplotlib-Figur und gibt (fig, ax) zurück.
+    """
+    dpi = 100
+    figsize = (width_px / dpi, height_px / dpi)
+    fig, ax = plt.subplots(figsize=figsize, dpi=dpi)
+
+    # Nebenländer
+    for gdf in neben_gdfs:
+        gdf.plot(ax=ax, color=colors["nebenland"], edgecolor=colors["grenze"])
+
+    # Hauptland
+    haupt_gdf.plot(ax=ax, color=colors["hauptland"], edgecolor=colors["grenze"])
+
+    # Hervorhebung
+    if highlight_cfg.get("aktiv") and highlight_cfg.get("namen"):
+        gdf_highlight = haupt_gdf[
+            haupt_gdf["NAME_1"].isin(highlight_cfg["namen"])
+        ]
+        gdf_highlight.plot(
+            ax=ax,
+            color=colors["highlight"],
+            edgecolor=colors["grenze"]
+        )
+
+    ax.set_xlim(bbox[0], bbox[1])
+    ax.set_ylim(bbox[2], bbox[3])
     ax.axis("off")
+
     return fig, ax
 
-def save_map(fig, out_dir, region, crs):
-    ts = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-    base = f"map_{region}_{crs.replace(':','_')}_{ts}"
-    for ext in ("png","svg"):
-        path = os.path.join(out_dir, f"{base}.{ext}")
-        fig.savefig(path, dpi=100, transparent=True if ext=="png" else False, pad_inches=0)
-        print(f"→ {path}")
+
+def save_map(
+    fig,
+    output_dir: str,
+    region: str,
+    crs: str,
+    width_px: int,
+    height_px: int
+):
+    """
+    Speichert die Figur als PNG und SVG in output_dir.
+    """
+    timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+    base = f"{region}_{crs.replace(':','_')}_{timestamp}"
+
+    for ext in ("png", "svg"):
+        filepath = os.path.join(output_dir, f"{base}.{ext}")
+        if ext == "png":
+            fig.savefig(
+                filepath,
+                dpi=100,
+                transparent=True,
+                bbox_inches=None,
+                pad_inches=0
+            )
+        else:  # svg
+            fig.savefig(
+                filepath,
+                format="svg",
+                bbox_inches=None,
+                pad_inches=0
+            )
+        print(f"Karte gespeichert: {filepath}")
+
     plt.close(fig)
