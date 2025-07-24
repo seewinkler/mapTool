@@ -1,5 +1,5 @@
 {
-  "hauptland": ["ADM_ADM_1"],
+  "hauptland": ["ADM_ADM_0", "ADM_ADM_1"],
   "nebenlaender": "ADM_ADM_0",
   "farben": {
     "hauptland": "#538B32",
@@ -17,11 +17,10 @@
     "hoehe": 485,
     "zoomlevel_vertikal": 0.0,
     "zoomlevel_horizontal": 0.0,
-    "debug": true,
-    "interaktiv": true
+    "debug": true
   },
   "ausblenden": {
-    "aktiv": true,
+    "aktiv": false,
     "bereiche": {
       "ADM_ADM_1": ["Hawaii", "Alaska"]
     }

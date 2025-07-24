@@ -5,12 +5,34 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from datetime import datetime
 
+from layer_selector import get_layers_interactive, get_layers_from_config
+from highlight_selector import select_highlight_regions
+from ausblenden import select_ausblendbereiche
+
+
+
 # 📁 Basisverzeichnisse
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 hauptland_path = os.path.join(BASE_DIR, "hauptland")
 nebenland_path = os.path.join(BASE_DIR, "nebenlaender")
 output_path = os.path.join(BASE_DIR, "output")
 config_path = os.path.join(BASE_DIR, "config.json")
+
+# Input-Modus
+while True:
+    modus = input("🛠️ Modus wählen – [n]ormal oder [s]pezial? ").strip().lower()
+    if modus.startswith("n"):
+        spezialmodus = False
+        break
+    elif modus.startswith("s"):
+        spezialmodus = True
+        break
+    else:
+        print("❌ Ungültige Eingabe. Bitte 'n' für normal oder 's' für spezial eingeben.")
+        
+
+
+
 
 # 🧾 Konfiguration laden
 with open(config_path, encoding="utf-8") as f:
@@ -64,42 +86,53 @@ for datei in nebenland_dateien:
     gdf = gpd.read_file(pfad, layer=config["nebenlaender"])
     nebenlaender_gdfs.append(gdf)
 
+# Layer-Auswahl
+if spezialmodus:
+    hauptland_layer_liste = get_layers_interactive(hauptland_gpkg)
+else:
+    hauptland_layer_liste = get_layers_from_config(config)
+
+    
+# Ausblenden
+if spezialmodus:
+    ausblenden_config = select_ausblendbereiche(hauptland_gpkg, hauptland_layer_liste)
+else:
+    ausblenden_config = {
+        "aktiv": False,
+        "bereiche": {}
+    }
+
 # 🗺️ Hauptland-Layer laden und vereinigen
 gdf_haupt_list = []
-for layer in config["hauptland"]:
+
+# Ausgeblendete Regionen vorbereiten
+verbotene_namen = set()
+if ausblenden_config["aktiv"]:
+    for namen in ausblenden_config["bereiche"].values():
+        verbotene_namen.update(namen)
+
+for layer in hauptland_layer_liste:
     gdf = gpd.read_file(hauptland_gpkg, layer=layer)
 
-    if config["ausblenden"]["aktiv"]:
-        ausblend_bereiche = config["ausblenden"]["bereiche"]
-        if layer in ausblend_bereiche:
-            namen = ausblend_bereiche[layer]
-            gdf = gdf[~gdf["NAME_1"].isin(namen)]  # ggf. Spaltenname prüfen
-            print(f"Aus Layer '{layer}' ausgeblendet: {namen}")
+    if ausblenden_config["aktiv"] and layer in ausblenden_config["bereiche"]:
+        namen = ausblenden_config["bereiche"][layer]
+        gdf = gdf[~gdf["NAME_1"].isin(namen)]
+        print(f"Aus Layer '{layer}' ausgeblendet: {namen}")
 
     gdf_haupt_list.append(gdf)
 
 gdf_haupt = pd.concat(gdf_haupt_list, ignore_index=True)
 
-# 🔦 Hervorhebung vorbereiten (nur Namen merken)
-highlight_config = config["hervorhebung"]
-highlight_layer = highlight_config["layer"]
-gewaehlte_namen = []
-if highlight_config["aktiv"]:
-    print("\n📍 Verfügbare Regionen für Hervorhebung:")
-    gdf_highlight_source = gpd.read_file(hauptland_gpkg, layer=highlight_layer)
-    region_names = sorted(gdf_highlight_source["NAME_1"].dropna().unique())
 
-    for i, name in enumerate(region_names, 1):
-        print(f"{i}. {name}")
-
-    auswahl = input("\nGib die Nummern der Regionen ein, durch Komma getrennt (z. B. 3,7,15): ")
-    try:
-        indices = [int(i.strip()) - 1 for i in auswahl.split(",")]
-        gewaehlte_namen = [region_names[i] for i in indices if 0 <= i < len(region_names)]
-        print(f"Hervorgehobene Regionen: {gewaehlte_namen}")
-    except Exception:
-        print("Ungültige Eingabe – keine Hervorhebung aktiv.")
-        gewaehlte_namen = []
+# Hervorhebung
+if spezialmodus:
+    highlight_config = select_highlight_regions(hauptland_gpkg, config, verbotene_namen)
+else:
+    highlight_config = {
+        "aktiv": False,
+        "layer": "",
+        "namen": []
+    }
 
 # 🔁 Karten für alle Projektionen
 for ziel_crs in ziel_crs_liste:
@@ -109,13 +142,15 @@ for ziel_crs in ziel_crs_liste:
     nebenlaender_proj = [gdf.to_crs(ziel_crs) for gdf in nebenlaender_gdfs]
 
     # ✨ Hervorhebung reprojizieren
-    if highlight_config["aktiv"] and gewaehlte_namen:
+    if highlight_config["aktiv"] and highlight_config["namen"]:
+        gdf_highlight_source = gpd.read_file(hauptland_gpkg, layer=highlight_config["layer"])
         gdf_highlight_source_proj = gdf_highlight_source.to_crs(ziel_crs)
         gdf_highlight = gdf_highlight_source_proj[
-            gdf_highlight_source_proj["NAME_1"].isin(gewaehlte_namen)
+            gdf_highlight_source_proj["NAME_1"].isin(highlight_config["namen"])
         ]
     else:
         gdf_highlight = None
+
 
     # 🔲 Bounding Box
     minx, miny, maxx, maxy = gdf_haupt_proj.total_bounds
@@ -138,7 +173,7 @@ for ziel_crs in ziel_crs_liste:
         center_x - new_width / 2,
         center_x + new_width / 2,
         center_y - new_height / 2,
-        center_y + new_height / 2
+        center_y + new_height / 2,
     )
 
     # 🖼️ Plot
@@ -158,7 +193,9 @@ for ziel_crs in ziel_crs_liste:
     timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
     output_filename_png = f"{os.path.splitext(hauptland_file)[0]}_{region}_{ziel_crs_safe}_{timestamp}.png"
     output_filepath_png = os.path.join(output_path, output_filename_png)
-    plt.savefig(output_filepath_png, dpi=dpi, bbox_inches=None, pad_inches=0, transparent=True)
+    plt.savefig(
+        output_filepath_png, dpi=dpi, bbox_inches=None, pad_inches=0, transparent=True
+    )
 
     # 💾 Speichern als SVG
     output_filename_svg = f"{os.path.splitext(hauptland_file)[0]}_{region}_{ziel_crs_safe}_{timestamp}.svg"
@@ -168,4 +205,6 @@ for ziel_crs in ziel_crs_liste:
     # 🧹 Plot schließen
     plt.close()
 
-    print(f"Karten gespeichert unter:\n → PNG: {output_filepath_png}\n → SVG: {output_filepath_svg}")
+    print(
+        f"Karten gespeichert unter:\n → PNG: {output_filepath_png}\n → SVG: {output_filepath_svg}"
+    )
