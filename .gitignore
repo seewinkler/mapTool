@@ -1,0 +1,6 @@
+*.gpkg
+*.png
+*.zip
+__pycache__/
+output/
+GPKG/

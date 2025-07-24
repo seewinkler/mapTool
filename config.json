@@ -1,0 +1,39 @@
+{
+  "hauptland": ["ADM_ADM_1"],
+  "nebenlaender": "ADM_ADM_0",
+  "farben": {
+    "hauptland": "#538B32",
+    "nebenland": "#969696",
+    "grenze": "#000000",
+    "highlight": "#c8d429"
+  },
+  "hervorhebung": {
+    "aktiv": true,
+    "layer": "ADM_ADM_1",
+    "namen": []
+  },
+  "karte": {
+    "breite": 1240,
+    "hoehe": 485,
+    "zoomlevel_vertikal": 0.0,
+    "zoomlevel_horizontal": 0.0,
+    "debug": true,
+    "interaktiv": true
+  },
+  "ausblenden": {
+    "aktiv": true,
+    "bereiche": {
+      "ADM_ADM_1": ["Hawaii", "Alaska"]
+    }
+  },
+    "regionen": {
+    "arktis":       ["EPSG:3575", "EPSG:3857"],
+    "nordamerika":  ["EPSG:2163", "EPSG:3857"],
+    "südamerika":   ["EPSG:31983", "EPSG:3857"],
+    "europa":       ["EPSG:3035", "EPSG:3857"],
+    "afrika":       ["EPSG:102022", "EPSG:3857"],
+    "asien":        ["EPSG:102025", "EPSG:3857"],
+    "ozeanien":     ["EPSG:102027", "EPSG:3857"],
+    "global":       ["EPSG:3857"]
+  }  
+}
