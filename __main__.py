@@ -29,10 +29,6 @@ while True:
         break
     else:
         print("❌ Ungültige Eingabe. Bitte 'n' für normal oder 's' für spezial eingeben.")
-        
-
-
-
 
 # 🧾 Konfiguration laden
 with open(config_path, encoding="utf-8") as f:
