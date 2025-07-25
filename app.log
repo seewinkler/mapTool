@@ -614,3 +614,6 @@
 2025-07-25 09:45:30,011 INFO [mymaptool.plotting] Karte gespeichert: d:\Gotti\Code\mapTool\output\nordamerika_EPSG_2163_2025-07-25_09-45-28.png
 2025-07-25 09:45:33,666 INFO [mymaptool.plotting] Karte gespeichert: d:\Gotti\Code\mapTool\output\nordamerika_EPSG_3857_2025-07-25_09-45-32.png
 2025-07-25 09:45:33,666 INFO [mymaptool.main] Alle Karten wurden erfolgreich erstellt.
+2025-07-25 09:56:01,581 INFO [mymaptool.plotting] Karte gespeichert: c:\Code\mapTool\output\europa_EPSG_3035_2025-07-25_09-56-01.png
+2025-07-25 09:56:02,003 INFO [mymaptool.plotting] Karte gespeichert: c:\Code\mapTool\output\europa_EPSG_3857_2025-07-25_09-56-01.png
+2025-07-25 09:56:02,012 INFO [mymaptool.main] Alle Karten wurden erfolgreich erstellt.
