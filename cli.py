@@ -29,6 +29,31 @@ def choose_mode() -> bool:
         logger.error("Eingabe abgebrochen.")
         raise
 
+def choose_dimensions(is_special: bool, config: Dict) -> Tuple[int, int]:
+    """
+    Gibt die Kartengröße (width_px, height_px) zurück.
+    - Im Normalmodus kommen die Werte aus config['karte'].
+    - Im Spezialmodus fragt der User Breite und Höhe in Pixel ab.
+    """
+    if not is_special:
+        w = config["karte"]["breite"]
+        h = config["karte"]["hoehe"]
+        logger.info(f"Normalmodus: Verwende {w}×{h} px aus config.json.")
+        return w, h
+
+    print("\nSpezialmodus aktiv: Bitte gewünschte Kartengröße eingeben (in Pixel).")
+    while True:
+        try:
+            w = int(input("Breite  (px): ").strip())
+            h = int(input("Höhe    (px): ").strip())
+            if w <= 0 or h <= 0:
+                print("❌ Werte müssen größer als 0 sein. Bitte erneut eingeben.")
+                continue
+            logger.info(f"Spezialmodus: Verwende benutzerdefinierte Größe {w}×{h} px.")
+            return w, h
+        except ValueError:
+            print("❌ Ungültige Zahl. Bitte ganze Pixelwerte eingeben.")
+
 
 def choose_region(config: Dict[str, List[str]]) -> Tuple[str, List[str]]:
     regions = list(config.get("regionen", {}))

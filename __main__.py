@@ -13,6 +13,7 @@ from cli import (
     choose_region,
     choose_export_formats,
     choose_scalebar_option,
+    choose_dimensions
 )
 from io_utils import find_gpkg_files
 from layer_selector import get_layers_interactive
@@ -27,7 +28,7 @@ from plotting import plot_map, save_map
 
 def main():
     # 1) Konfiguration laden
-    config = load_config()
+    config = load_config("config.json")
 
     # 2) Logging konfigurieren
     log_level_str = config.get("logging", {}).get("level", "INFO").upper()
@@ -50,47 +51,41 @@ def main():
     logger = logging.getLogger("mymaptool.main")
 
     try:
-        # 3) Basis-Pfade
+        # 3) Basis-Pfade anlegen
         base_dir = os.path.dirname(os.path.abspath(__file__))
         hauptland_dir = os.path.join(base_dir, "hauptland")
         nebenlaender_dir = os.path.join(base_dir, "nebenlaender")
-        output_dir = os.path.join(
-            base_dir,
-            config.get("output_dir", "output")
-        )
+        output_dir = os.path.join(base_dir, config.get("output_dir", "output"))
         os.makedirs(output_dir, exist_ok=True)
 
-        # 4) Modus & Region wählen
+        # 4) Modus wählen
         spezialmodus = choose_mode()
+
+        # 5) Region wählen
         region, ziel_crs_list = choose_region(config)
 
-        # 5) Scalebar-Konfiguration
-        scalebar_cfg = config.get(
-            "scalebar", {"show": True, "position": "bottom-left"}
-        )
+        # 6) Kartengröße bestimmen
+        breite_px, hoehe_px = choose_dimensions(spezialmodus, config)
+
+        # 7) Scalebar konfigurieren
+        scalebar_cfg = config.get("scalebar", {"show": True, "position": "bottom-left"})
         if spezialmodus:
             scalebar_cfg = choose_scalebar_option()
 
-        # 6) Export-Formate
-        export_formats = {"png"}
-        if spezialmodus:
-            export_formats = choose_export_formats()
-
-        # 7) GPKG-Dateien finden
+        # 8) GPKG-Dateien finden
         haupt_gpkg_path, neben_gdfs = find_gpkg_files(
             hauptland_dir,
             nebenlaender_dir,
             config.get("nebenlaender", []),
         )
 
-        # 8) Layer-Auswahl
-        haupt_layers = (
-            get_layers_interactive(haupt_gpkg_path)
-            if spezialmodus
-            else config.get("hauptland", [])
-        )
+        # 9) Layer-Auswahl
+        if spezialmodus:
+            haupt_layers = get_layers_interactive(haupt_gpkg_path)
+        else:
+            haupt_layers = config.get("hauptland", [])
 
-        # 9) Geodaten verarbeiten
+        # 10) Geodaten verarbeiten
         gdf_haupt = merge_hauptland_layers(haupt_gpkg_path, haupt_layers)
         gdf_haupt, ausgeblendet_namen = apply_ausblenden(
             gdf_haupt,
@@ -108,17 +103,23 @@ def main():
             ausgeblendet_namen,
         )
 
-        # 10) Plot-Parameter
-        breite_px = config["karte"]["breite"]
-        hoehe_px = config["karte"]["hoehe"]
+        # 11) Export-Formate wählen (erst jetzt, am Ende der Interaktion)
+        export_formats = {"png"}
+        if spezialmodus:
+            export_formats = choose_export_formats()
+
+        # 12) Karten erstellen & speichern
         aspect_ratio = breite_px / hoehe_px
 
-        # 11) Rendering & Speichern
         for ziel_crs in tqdm(ziel_crs_list, desc="Projektionen"):
+            # reprojiziere
             haupt_proj = reproject(gdf_haupt, ziel_crs)
             neben_proj = [reproject(g, ziel_crs) for g in neben_gdfs]
+
+            # Bounding Box passend zum Seitenverhältnis
             bbox = compute_bbox(haupt_proj, aspect_ratio)
 
+            # Plotten
             fig, ax = plot_map(
                 haupt_proj,
                 neben_proj,
@@ -130,6 +131,7 @@ def main():
                 scalebar_cfg=scalebar_cfg,
             )
 
+            # Speichern
             save_map(
                 fig,
                 output_dir,
