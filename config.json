@@ -1,4 +1,8 @@
 {
+  "logging": {
+    "level": "INFO",
+    "file": "app.log"
+  },
   "hauptland": ["ADM_ADM_0", "ADM_ADM_1"],
   "nebenlaender": "ADM_ADM_0",
   "farben": {
@@ -25,14 +29,14 @@
       "ADM_ADM_1": ["Hawaii", "Alaska"]
     }
   },
-    "regionen": {
-    "arktis":       ["EPSG:3575", "EPSG:3857"],
-    "nordamerika":  ["EPSG:2163", "EPSG:3857"],
-    "südamerika":   ["EPSG:31983", "EPSG:3857"],
-    "europa":       ["EPSG:3035", "EPSG:3857"],
-    "afrika":       ["EPSG:102022", "EPSG:3857"],
-    "asien":        ["EPSG:102025", "EPSG:3857"],
-    "ozeanien":     ["EPSG:102027", "EPSG:3857"],
-    "global":       ["EPSG:3857"]
-  }  
+  "regionen": {
+    "arktis": ["EPSG:3575", "EPSG:3857"],
+    "nordamerika": ["EPSG:2163", "EPSG:3857"],
+    "südamerika": ["EPSG:31983", "EPSG:3857"],
+    "europa": ["EPSG:3035", "EPSG:3857"],
+    "afrika": ["EPSG:102022", "EPSG:3857"],
+    "asien": ["EPSG:102025", "EPSG:3857"],
+    "ozeanien": ["EPSG:102027", "EPSG:3857"],
+    "global": ["EPSG:3857"]
+  }
 }

@@ -3,6 +3,8 @@
 import os
 import matplotlib.pyplot as plt
 from datetime import datetime
+import logging
+logger = logging.getLogger("mymaptool.plotting")
 
 
 def plot_map(
@@ -76,6 +78,6 @@ def save_map(
                 bbox_inches=None,
                 pad_inches=0
             )
-        print(f"Karte gespeichert: {filepath}")
+        logger.info(f"Karte gespeichert: {filepath}")
 
     plt.close(fig)

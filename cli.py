@@ -1,6 +1,22 @@
 # cli.py
 
 from typing import Tuple, List
+from rich.logging import RichHandler
+import logging
+
+logger = logging.getLogger("mymaptool.cli")
+
+def choose_mode() -> bool:
+    logger.debug("Modus-Auswahl gestartet")
+    while True:
+        ans = input("🛠️ Modus wählen – [n]ormal oder [s]pezial? ").strip().lower()
+        if ans.startswith("n"):
+            logger.info("Normalmodus gewählt")
+            return False
+        if ans.startswith("s"):
+            logger.info("Spezialmodus gewählt")
+            return True
+        logger.warning("Ungültige Eingabe für Modus")
 
 def choose_mode() -> bool:
     """

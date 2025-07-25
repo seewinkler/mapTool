@@ -14,10 +14,37 @@ from data_processing.layers import (
 from data_processing.crs import reproject, compute_bbox
 from plotting import plot_map, save_map
 
+import logging
+from rich.logging import RichHandler
+from tqdm import tqdm
+
 
 def main():
     # 1) Konfiguration
     config = load_config()
+
+    # Logging konfigurieren
+    # Level aus config
+    level = config.get("logging", {}).get("level", "INFO").upper()
+
+    # Handler-Liste: Konsole immer, Datei optional
+    handlers = [RichHandler(rich_tracebacks=True)]
+    if logfile := config.get("logging", {}).get("file"):
+        fh = logging.FileHandler(logfile, encoding="utf-8")
+        fh.setFormatter(
+            logging.Formatter(
+                "%(asctime)s | %(levelname)s | %(message)s", datefmt="%H:%M:%S"
+            )
+        )
+        handlers.append(fh)
+
+    logging.basicConfig(
+        level=level,
+        format="%(asctime)s | %(levelname)s | %(message)s",
+        datefmt="%H:%M:%S",
+        handlers=handlers,
+    )
+    logger = logging.getLogger("mapTool")
 
     # 2) Basis-Pfade
     BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -28,7 +55,7 @@ def main():
     # 3) Modus & Region
     spezialmodus = choose_mode()
     region, ziel_crs_list = choose_region(config)
-    
+
     export_formats = {"png"}  # Standard
     if spezialmodus:
         export_formats = choose_export_formats()
@@ -56,7 +83,7 @@ def main():
         haupt_layers,
         spezialmodus,
     )
-    print("DEBUG – ausgeblendete Regionen:", ausgeblendet_namen)
+    logger.debug(f"Ausgeblendete Regionen: {ausgeblendet_namen}")
 
     # 8) Hervorhebung auswählen (mit Ausschluss der ausgeblendeten Namen)
     highlight_cfg = select_highlights(
@@ -73,7 +100,8 @@ def main():
     aspect_ratio = breite_px / hoehe_px
 
     # 10) Für jede Projektion Karte rendern & speichern
-    for ziel_crs in ziel_crs_list:
+
+    for ziel_crs in tqdm(ziel_crs_list, desc="Projektionen"):
         haupt_proj = reproject(gdf_haupt, ziel_crs)
         neben_proj = [reproject(g, ziel_crs) for g in neben_gdfs]
         bbox = compute_bbox(haupt_proj, aspect_ratio)
