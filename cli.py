@@ -9,7 +9,6 @@ logger.setLevel(logging.INFO)
 handler = RichHandler(rich_tracebacks=True)
 logger.addHandler(handler)
 
-
 def choose_mode() -> bool:
     """
     Fragt den Nutzer, ob der normale oder der Spezialmodus gewählt werden soll.
@@ -28,6 +27,53 @@ def choose_mode() -> bool:
     except KeyboardInterrupt:
         logger.error("Eingabe abgebrochen.")
         raise
+
+def choose_background_option() -> Dict[str, object]:
+    """
+    Spezialmodus: fragt, ob Hintergrund blau oder transparent sein soll.
+    Gibt dict mit 'color' und 'transparent' zurück.
+    """
+    options = [
+        ("Meeresblau   (#2896BA)", ("#2896BA", False)),
+        ("Transparent (PNG-Hintergrund)", (None, True)),
+    ]
+    print("\nHintergrund wählen:")
+    for i, (label, _) in enumerate(options, start=1):
+        suffix = " (Standard)" if i == 1 else ""
+        print(f"  [{i}] {label}{suffix}")
+
+    while True:
+        choice = input("Auswahl [1–2]: ").strip()
+        if choice in {"1", "2"}:
+            color, transp = options[int(choice) - 1][1]
+            return {"color": color if color else "none", "transparent": transp}
+        print("Ungültige Eingabe, bitte 1 oder 2 wählen.")
+
+
+def choose_dimensions(is_special: bool, config: Dict) -> Tuple[int, int]:
+    """
+    Gibt die Kartengröße (width_px, height_px) zurück.
+    - Im Normalmodus kommen die Werte aus config['karte'].
+    - Im Spezialmodus fragt der User Breite und Höhe in Pixel ab.
+    """
+    if not is_special:
+        w = config["karte"]["breite"]
+        h = config["karte"]["hoehe"]
+        logger.info(f"Normalmodus: Verwende {w}×{h} px aus config.json.")
+        return w, h
+
+    print("\nSpezialmodus aktiv: Bitte gewünschte Kartengröße eingeben (in Pixel).")
+    while True:
+        try:
+            w = int(input("Breite  (px): ").strip())
+            h = int(input("Höhe    (px): ").strip())
+            if w <= 0 or h <= 0:
+                print("❌ Werte müssen größer als 0 sein. Bitte erneut eingeben.")
+                continue
+            logger.info(f"Spezialmodus: Verwende benutzerdefinierte Größe {w}×{h} px.")
+            return w, h
+        except ValueError:
+            print("❌ Ungültige Zahl. Bitte ganze Pixelwerte eingeben.")
 
 
 def choose_region(config: Dict[str, List[str]]) -> Tuple[str, List[str]]:

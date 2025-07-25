@@ -23,7 +23,7 @@ def add_scalebar(
     ax,
     extent,
     src_crs,
-    length_fraction=0.1,
+    length_fraction=0.05,
     position='bottom-left',
     show=True,
     color='white',
