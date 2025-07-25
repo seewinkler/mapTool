@@ -136,6 +136,7 @@ def main():
                 hoehe_px,
                 scalebar_cfg=scalebar_cfg,
                 background_cfg=background_cfg,
+                linien_cfg=config.get("linien"),
             )
 
             # Speichern

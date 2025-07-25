@@ -1,6 +1,6 @@
 {
   "logging": {
-    "level": "INFO",
+    "level": "DEBUG",
     "file": "app.log",
     "maxBytes": 5242880,
     "backupCount": 3
@@ -29,7 +29,10 @@
     "color": "#2896BA",
     "transparent": false
   },
-
+  "linien": {
+    "grenze_px": 1,
+    "highlight_px": 1
+  },
   "ausblenden": {
     "aktiv": false,
     "bereiche": {

@@ -6,6 +6,8 @@ from scalebar import add_scalebar
 
 logger = logging.getLogger("mymaptool.plotting")
 
+def pixel_to_pt(pixel, dpi):
+    return pixel * 72 / dpi
 
 def plot_map(
     haupt_gdf,
@@ -16,30 +18,14 @@ def plot_map(
     width_px: int,
     height_px: int,
     scalebar_cfg: dict = None,
-    background_cfg: dict = None
+    background_cfg: dict = None,
+    linien_cfg: dict = None  # 👈 NEU: Linienkonfiguration
 ):
-    """
-    Zeichnet bereits reprojizierte GeoDataFrames mit optionaler Scalebar
-    und Hintergrund-Option (Farbfüllung oder transparent).
-
-    haupt_gdf     – GeoDataFrame des Hauptgebiets (in Meter-CRS)
-    neben_gdfs    – Liste von GeoDataFrames der Nebenländer (in Meter-CRS)
-    highlight_cfg – Dict mit keys 'aktiv' (bool) und 'namen' (List[str])
-    colors        – Dict mit keys 'hauptland','nebenland','grenze','highlight'
-    bbox          – (xmin, xmax, ymin, ymax) in selben CRS-Einheiten
-    width_px      – Bildbreite in Pixel
-    height_px     – Bildhöhe in Pixel
-    scalebar_cfg  – Dict mit Scalebar-Optionen: show (bool), position (str),
-                     length_fraction (float), color (str),
-                     linewidth (float), fontsize (int)
-    background_cfg– Dict mit keys 'color' (Hex-String) und 'transparent' (bool).
-                     Wenn None: Hintergrund transparent.
-    """
-    dpi     = 100
+    dpi     = 600
     figsize = (width_px / dpi, height_px / dpi)
     fig, ax = plt.subplots(figsize=figsize, dpi=dpi)
 
-    # 0) Hintergrund setzen (Fallback: transparent)
+    # Hintergrund
     if background_cfg:
         bg_color  = background_cfg.get("color", "#2896BA")
         bg_transp = background_cfg.get("transparent", False)
@@ -49,49 +35,55 @@ def plot_map(
 
     fig.patch.set_facecolor(bg_color)
     ax.set_facecolor(bg_color)
-    if bg_transp:
-        fig.patch.set_alpha(0)
-        ax.patch.set_alpha(0)
-    else:
-        fig.patch.set_alpha(1)
-        ax.patch.set_alpha(1)
+    fig.patch.set_alpha(0 if bg_transp else 1)
+    ax.patch.set_alpha(0 if bg_transp else 1)
 
-    # 1) Nebenländer zeichnen
+    # Linienstärken auslesen (in Pixeln, umgerechnet in pt)
+    if linien_cfg:
+        linewidth_grenze = pixel_to_pt(linien_cfg.get("grenze_px", 1), dpi)
+        linewidth_highlight = pixel_to_pt(linien_cfg.get("highlight_px", 1), dpi)
+    else:
+        linewidth_grenze = pixel_to_pt(1, dpi)
+        linewidth_highlight = pixel_to_pt(1, dpi)
+    logger.debug(f"Linienstärken (pt): Grenze={linewidth_grenze:.2f}, Highlight={linewidth_highlight:.2f}")
+
+
+    # Nebenländer
     for g in neben_gdfs:
         g.plot(
             ax=ax,
             color=colors["nebenland"],
-            edgecolor=colors["grenze"]
+            edgecolor=colors["grenze"],
+            linewidth=linewidth_grenze
         )
 
-    # 2) Hauptland zeichnen
+    # Hauptland
     haupt_gdf.plot(
         ax=ax,
         color=colors["hauptland"],
-        edgecolor=colors["grenze"]
+        edgecolor=colors["grenze"],
+        linewidth=linewidth_grenze
     )
 
-    # 3) Hervorhebung zeichnen
+    # Hervorhebung
     if highlight_cfg.get("aktiv") and highlight_cfg.get("namen"):
         mask = haupt_gdf["NAME_1"].isin(highlight_cfg["namen"])
         haupt_gdf[mask].plot(
             ax=ax,
             color=colors["highlight"],
-            edgecolor=colors["grenze"]
+            edgecolor=colors["grenze"],
+            linewidth=linewidth_highlight
         )
 
-    # 4) Ansicht beschneiden und Achsen ausblenden
+    # Bounding Box und Achsen
     xmin, xmax, ymin, ymax = bbox
     ax.set_xlim(xmin, xmax)
     ax.set_ylim(ymin, ymax)
     ax.axis("off")
 
-    # 5) Scalebar hinzufügen
+    # Scalebar
     if scalebar_cfg and scalebar_cfg.get("show", False):
-        xmin_ax, xmax_ax = ax.get_xlim()
-        ymin_ax, ymax_ax = ax.get_ylim()
-        extent = [xmin_ax, xmax_ax, ymin_ax, ymax_ax]
-
+        extent = [*ax.get_xlim(), *ax.get_ylim()]
         add_scalebar(
             ax,
             extent,
@@ -105,7 +97,6 @@ def plot_map(
         )
 
     return fig, ax
-
 
 def save_map(
     fig,
@@ -129,7 +120,7 @@ def save_map(
     base = f"{region}_{crs.replace(':','_')}_{timestamp}"
 
     # Konstantes DPI
-    dpi = 100
+    dpi = 600
 
     # Figure-Größe in Zoll so setzen, dass dpi * Zoll = gewünschte Pixelgröße
     fig.set_size_inches(width_px / dpi, height_px / dpi)
