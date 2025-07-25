@@ -46,3 +46,22 @@ def choose_region(config: dict) -> Tuple[str, List[str]]:
 
     ziel_crs_list = config["regionen"][region_name]
     return region_name, ziel_crs_list
+
+def choose_export_formats() -> set[str]:
+    """
+    Im Spezialmodus: Auswahl, ob PNG, SVG oder beides exportiert werden sollen.
+    Standard: Nur PNG.
+    """
+    print("\n🎨 Exportformate wählen:")
+    print("  [1] Nur PNG (Standard)")
+    print("  [2] Nur SVG")
+    print("  [3] PNG & SVG")
+
+    auswahl = input("Format auswählen [1/2/3]: ").strip()
+    if auswahl == "2":
+        return {"svg"}
+    if auswahl == "3":
+        return {"png", "svg"}
+
+    # Default
+    return {"png"}

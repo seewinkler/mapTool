@@ -53,15 +53,13 @@ def save_map(
     region: str,
     crs: str,
     width_px: int,
-    height_px: int
+    height_px: int,
+    export_formats: set[str] = {"png"}  # Default
 ):
-    """
-    Speichert die Figur als PNG und SVG in output_dir.
-    """
     timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
     base = f"{region}_{crs.replace(':','_')}_{timestamp}"
 
-    for ext in ("png", "svg"):
+    for ext in export_formats:
         filepath = os.path.join(output_dir, f"{base}.{ext}")
         if ext == "png":
             fig.savefig(
@@ -71,7 +69,7 @@ def save_map(
                 bbox_inches=None,
                 pad_inches=0
             )
-        else:  # svg
+        elif ext == "svg":
             fig.savefig(
                 filepath,
                 format="svg",

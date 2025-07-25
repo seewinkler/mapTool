@@ -3,7 +3,7 @@
 import os
 
 from config import load_config
-from cli import choose_mode, choose_region
+from cli import choose_mode, choose_region, choose_export_formats
 from io_utils import find_gpkg_files
 from layer_selector import get_layers_interactive
 from data_processing.layers import (
@@ -28,6 +28,10 @@ def main():
     # 3) Modus & Region
     spezialmodus = choose_mode()
     region, ziel_crs_list = choose_region(config)
+    
+    export_formats = {"png"}  # Standard
+    if spezialmodus:
+        export_formats = choose_export_formats()
 
     # 4) GPKG-Dateien holen
     haupt_gpkg_path, neben_gdfs = find_gpkg_files(
@@ -84,7 +88,7 @@ def main():
             hoehe_px,
         )
 
-        save_map(fig, output_dir, region, ziel_crs, breite_px, hoehe_px)
+        save_map(fig, output_dir, region, ziel_crs, breite_px, hoehe_px, export_formats)
 
 
 if __name__ == "__main__":
