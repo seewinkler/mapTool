@@ -11,9 +11,10 @@ from config import load_config
 from cli import (
     choose_mode,
     choose_region,
-    choose_export_formats,
+    choose_dimensions,
     choose_scalebar_option,
-    choose_dimensions
+    choose_background_option,
+    choose_export_formats    
 )
 from io_utils import find_gpkg_files
 from layer_selector import get_layers_interactive
@@ -71,6 +72,11 @@ def main():
         scalebar_cfg = config.get("scalebar", {"show": True, "position": "bottom-left"})
         if spezialmodus:
             scalebar_cfg = choose_scalebar_option()
+            
+       # 7) Background-Konfiguration
+        background_cfg = config.get("background", {"color":"#2896BA","transparent":False})
+        if spezialmodus:
+            background_cfg = choose_background_option()
 
         # 8) GPKG-Dateien finden
         haupt_gpkg_path, neben_gdfs = find_gpkg_files(
@@ -129,6 +135,7 @@ def main():
                 breite_px,
                 hoehe_px,
                 scalebar_cfg=scalebar_cfg,
+                background_cfg=background_cfg,
             )
 
             # Speichern
@@ -140,6 +147,7 @@ def main():
                 breite_px,
                 hoehe_px,
                 export_formats,
+                background_cfg=background_cfg,
             )
 
         logger.info("Alle Karten wurden erfolgreich erstellt.")

@@ -25,6 +25,11 @@
     "zoomlevel_horizontal": 0.0,
     "debug": true
   },
+  "background": {
+    "color": "#2896BA",
+    "transparent": false
+  },
+
   "ausblenden": {
     "aktiv": false,
     "bereiche": {

@@ -9,7 +9,6 @@ logger.setLevel(logging.INFO)
 handler = RichHandler(rich_tracebacks=True)
 logger.addHandler(handler)
 
-
 def choose_mode() -> bool:
     """
     Fragt den Nutzer, ob der normale oder der Spezialmodus gewählt werden soll.
@@ -28,6 +27,28 @@ def choose_mode() -> bool:
     except KeyboardInterrupt:
         logger.error("Eingabe abgebrochen.")
         raise
+
+def choose_background_option() -> Dict[str, object]:
+    """
+    Spezialmodus: fragt, ob Hintergrund blau oder transparent sein soll.
+    Gibt dict mit 'color' und 'transparent' zurück.
+    """
+    options = [
+        ("Meeresblau   (#2896BA)", ("#2896BA", False)),
+        ("Transparent (PNG-Hintergrund)", (None, True)),
+    ]
+    print("\nHintergrund wählen:")
+    for i, (label, _) in enumerate(options, start=1):
+        suffix = " (Standard)" if i == 1 else ""
+        print(f"  [{i}] {label}{suffix}")
+
+    while True:
+        choice = input("Auswahl [1–2]: ").strip()
+        if choice in {"1", "2"}:
+            color, transp = options[int(choice) - 1][1]
+            return {"color": color if color else "none", "transparent": transp}
+        print("Ungültige Eingabe, bitte 1 oder 2 wählen.")
+
 
 def choose_dimensions(is_special: bool, config: Dict) -> Tuple[int, int]:
     """
