@@ -40,5 +40,9 @@
     "asien": ["EPSG:102025", "EPSG:3857"],
     "ozeanien": ["EPSG:102027", "EPSG:3857"],
     "global": ["EPSG:3857"]
+  },
+  "scalebar": {
+    "show": true,
+    "position": "bottom-left"
   }
 }

@@ -1,72 +1,92 @@
 # cli.py
 
-from typing import Tuple, List
-from rich.logging import RichHandler
+from typing import Tuple, List, Set, Dict
 import logging
+from rich.logging import RichHandler
 
 logger = logging.getLogger("mymaptool.cli")
+logger.setLevel(logging.INFO)
+handler = RichHandler(rich_tracebacks=True)
+logger.addHandler(handler)
 
-def choose_mode() -> bool:
-    logger.debug("Modus-Auswahl gestartet")
-    while True:
-        ans = input("🛠️ Modus wählen – [n]ormal oder [s]pezial? ").strip().lower()
-        if ans.startswith("n"):
-            logger.info("Normalmodus gewählt")
-            return False
-        if ans.startswith("s"):
-            logger.info("Spezialmodus gewählt")
-            return True
-        logger.warning("Ungültige Eingabe für Modus")
 
 def choose_mode() -> bool:
     """
-    Interaktive Auswahl des Modus.
-    Gibt False für 'normal' und True für 'spezial' zurück.
+    Fragt den Nutzer, ob der normale oder der Spezialmodus gewählt werden soll.
+    Rückgabe:
+      False = normal
+      True  = spezial
     """
-    while True:
-        ans = input("🛠️ Modus wählen – [n]ormal oder [s]pezial? ").strip().lower()
-        if ans.startswith("n"):
-            return False
-        if ans.startswith("s"):
-            return True
-        print("❌ Ungültige Eingabe. Bitte mit 'n' oder 's' bestätigen.")
+    try:
+        while True:
+            ans = input("🛠️ Modus wählen – [n]ormal oder [s]pezial? ").strip().lower()
+            if ans.startswith("n"):
+                return False
+            if ans.startswith("s"):
+                return True
+            print("❌ Ungültige Eingabe. Bitte mit 'n' oder 's' bestätigen.")
+    except KeyboardInterrupt:
+        logger.error("Eingabe abgebrochen.")
+        raise
 
-def choose_region(config: dict) -> Tuple[str, List[str]]:
-    """
-    Interaktive Auswahl der Region.
-    Liest aus config['regionen'] die verfügbaren Regionen aus,
-    lässt den Nutzer per Nummer oder Name wählen
-    und liefert (region_name, ziel_crs_list) zurück.
-    """
+
+def choose_region(config: Dict[str, List[str]]) -> Tuple[str, List[str]]:
     regions = list(config.get("regionen", {}))
     if not regions:
+        logger.error("Keine Regionen in der Konfiguration gefunden.")
         raise ValueError("Keine Regionen in der Konfiguration gefunden.")
 
     print("\nVerfügbare Regionen:")
     for idx, name in enumerate(regions, 1):
         print(f"  {idx}. {name}")
 
-    w = input("Bitte eine Region wählen (Nummer oder Name eingeben): ").strip()
+    w = input("Bitte eine Region wählen (Nummer oder Name): ").strip()
     region_name = None
-
     if w.isdigit():
         idx = int(w) - 1
         if 0 <= idx < len(regions):
             region_name = regions[idx]
-    else:
-        if w in regions:
-            region_name = w
+    elif w in regions:
+        region_name = w
 
     if region_name is None:
+        logger.error(f"Ungültige Region: {w}")
         raise ValueError(f"Ungültige Region: {w}")
 
-    ziel_crs_list = config["regionen"][region_name]
-    return region_name, ziel_crs_list
+    return region_name, config["regionen"][region_name]
 
-def choose_export_formats() -> set[str]:
+
+def choose_scalebar_option() -> Dict[str, object]:
+    options = [
+        ("links unten", ("bottom-left", True)),
+        ("rechts unten", ("bottom-right", True)),
+        ("mitte unten", ("bottom-center", True)),
+        ("keine Scalebar", (None, False)),
+    ]
+
+    print("\nScalebar erstellen?")
+    for i, (label, _) in enumerate(options, start=1):
+        suffix = " (Standard)" if i == 1 else ""
+        print(f"  [{i}] {label}{suffix}")
+
+    attempts = 0
+    while True:
+        choice = input("Auswahl [1–4]: ").strip()
+        if choice in {"1", "2", "3", "4"}:
+            pos, show = options[int(choice) - 1][1]
+            return {"show": show, "position": pos or "bottom-left"}
+        attempts += 1
+        logger.warning(f"Ungültige Scalebar-Auswahl: {choice}")
+        if attempts >= 3:
+            logger.info("Standard-Scalebar wird verwendet.")
+            return {"show": True, "position": "bottom-left"}
+        print("Ungültige Eingabe, bitte 1–4 wählen.")
+
+
+def choose_export_formats() -> Set[str]:
     """
-    Im Spezialmodus: Auswahl, ob PNG, SVG oder beides exportiert werden sollen.
-    Standard: Nur PNG.
+    Spezialmodus: Auswahl der Exportformate.
+    Standardmodus: gibt {'png'} zurück.
     """
     print("\n🎨 Exportformate wählen:")
     print("  [1] Nur PNG (Standard)")
@@ -79,5 +99,6 @@ def choose_export_formats() -> set[str]:
     if auswahl == "3":
         return {"png", "svg"}
 
-    # Default
+    if auswahl not in {"1", "2", "3"}:
+        logger.info("Ungültige Auswahl, verwende Standard PNG.")
     return {"png"}
