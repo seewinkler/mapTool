@@ -3,7 +3,8 @@
     "level": "DEBUG",
     "file": "app.log",
     "maxBytes": 5242880,
-    "backupCount": 3
+    "backupCount": 3,
+    "suppress_modules": ["matplotlib.font_manager"]
   },
   "hauptland": ["ADM_ADM_0", "ADM_ADM_1"],
   "nebenlaender": "ADM_ADM_0",
