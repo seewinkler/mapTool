@@ -588,3 +588,7 @@
 07:39:26 | INFO | Karte gespeichert: d:\Gotti\Code\mapTool\output\nordamerika_EPSG_3857_2025-07-25_07-39-23.svg
 07:42:11 | INFO | Karte gespeichert: d:\Gotti\Code\mapTool\output\nordamerika_EPSG_2163_2025-07-25_07-42-09.png
 07:42:15 | INFO | Karte gespeichert: d:\Gotti\Code\mapTool\output\nordamerika_EPSG_3857_2025-07-25_07-42-13.png
+2025-07-25 08:08:08,464 INFO [mymaptool.plotting] Karte gespeichert: d:\Gotti\Code\mapTool\output\nordamerika_EPSG_2163_2025-07-25_08-08-06.png
+2025-07-25 08:08:12,650 INFO [mymaptool.plotting] Karte gespeichert: d:\Gotti\Code\mapTool\output\nordamerika_EPSG_3857_2025-07-25_08-08-11.png
+2025-07-25 08:12:52,121 INFO [mymaptool.plotting] Karte gespeichert: d:\Gotti\Code\mapTool\output\nordamerika_EPSG_2163_2025-07-25_08-12-50.png
+2025-07-25 08:12:56,544 INFO [mymaptool.plotting] Karte gespeichert: d:\Gotti\Code\mapTool\output\nordamerika_EPSG_3857_2025-07-25_08-12-54.png

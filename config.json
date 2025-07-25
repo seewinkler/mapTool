@@ -1,7 +1,9 @@
 {
   "logging": {
     "level": "INFO",
-    "file": "app.log"
+    "file": "app.log",
+    "maxBytes": 5242880,
+    "backupCount": 3
   },
   "hauptland": ["ADM_ADM_0", "ADM_ADM_1"],
   "nebenlaender": "ADM_ADM_0",
