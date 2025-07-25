@@ -614,3 +614,14 @@
 2025-07-25 09:45:30,011 INFO [mymaptool.plotting] Karte gespeichert: d:\Gotti\Code\mapTool\output\nordamerika_EPSG_2163_2025-07-25_09-45-28.png
 2025-07-25 09:45:33,666 INFO [mymaptool.plotting] Karte gespeichert: d:\Gotti\Code\mapTool\output\nordamerika_EPSG_3857_2025-07-25_09-45-32.png
 2025-07-25 09:45:33,666 INFO [mymaptool.main] Alle Karten wurden erfolgreich erstellt.
+2025-07-25 10:30:22,263 ERROR [mymaptool.main] Fehler in main(): save_map() takes 4 positional arguments but 7 were given
+Traceback (most recent call last):
+  File "d:\Gotti\Code\mapTool\__main__.py", line 133, in main
+    save_map(
+TypeError: save_map() takes 4 positional arguments but 7 were given
+2025-07-25 10:32:15,441 INFO [mymaptool.plotting] Karte gespeichert: d:\Gotti\Code\mapTool\output\nordamerika_EPSG_2163_2025-07-25_10-32-13.png
+2025-07-25 10:32:20,990 INFO [mymaptool.plotting] Karte gespeichert: d:\Gotti\Code\mapTool\output\nordamerika_EPSG_3857_2025-07-25_10-32-18.png
+2025-07-25 10:32:20,990 INFO [mymaptool.main] Alle Karten wurden erfolgreich erstellt.
+2025-07-25 10:33:02,363 INFO [mymaptool.plotting] Karte gespeichert: d:\Gotti\Code\mapTool\output\nordamerika_EPSG_2163_2025-07-25_10-33-01.png
+2025-07-25 10:33:05,914 INFO [mymaptool.plotting] Karte gespeichert: d:\Gotti\Code\mapTool\output\nordamerika_EPSG_3857_2025-07-25_10-33-04.png
+2025-07-25 10:33:05,919 INFO [mymaptool.main] Alle Karten wurden erfolgreich erstellt.

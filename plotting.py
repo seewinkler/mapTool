@@ -96,28 +96,57 @@ def save_map(
     export_formats: set[str] = {"png"}
 ):
     """
-    Speichert fig im output_dir unter region, crs und timestamp.
+    Speichert die Karte in genau den Pixelmaßen (width_px × height_px),
+    ohne äußere Ränder, im angegebenen Ausgabeordner.
+    Dateiname: {region}_{crs}_{timestamp}.{ext}
     """
+    # 1. Timestamp und Basis-Pfad
     timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
     base = f"{region}_{crs.replace(':','_')}_{timestamp}"
 
+    # 2. Konstantes DPI
+    dpi = 100
+
+    # 3. Figure-Größe in Zoll so setzen, dass
+    #    dpi * Zoll = gewünschte Pixelgröße
+    fig.set_size_inches(width_px / dpi, height_px / dpi)
+
+    # 4. Subplots so strecken, dass Achsen exakt die Figure füllen
+    fig.subplots_adjust(left=0, right=1, top=1, bottom=0)
+
+    # 5. Achsen-Bounding-Box in Zoll berechnen
+    #    (wir nehmen die erste Achse – bei mehreren ggfs. anpassen)
+    ax = fig.axes[0] if fig.axes else None
+    if ax:
+        bbox_inches = ax.get_window_extent() \
+                         .transformed(fig.dpi_scale_trans.inverted())
+    else:
+        bbox_inches = None
+
+    # 6. Schleife über die gewünschten Formate
     for ext in export_formats:
         filepath = os.path.join(output_dir, f"{base}.{ext}")
-        if ext == "png":
+
+        if ext.lower() == "png":
             fig.savefig(
                 filepath,
-                dpi=100,
+                dpi=dpi,
                 transparent=True,
-                bbox_inches=None,
+                bbox_inches=bbox_inches,
                 pad_inches=0
             )
-        elif ext == "svg":
+        elif ext.lower() == "svg":
             fig.savefig(
                 filepath,
                 format="svg",
-                bbox_inches=None,
+                bbox_inches=bbox_inches,
                 pad_inches=0
             )
+        else:
+            logger.warning(f"Unbekanntes Format '{ext}' – übersprungen.")
+            continue
+
         logger.info(f"Karte gespeichert: {filepath}")
 
+    # 7. Aufräumen
     plt.close(fig)
