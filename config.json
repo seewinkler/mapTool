@@ -51,6 +51,11 @@
   },
   "scalebar": {
     "show": true,
-    "position": "bottom-left"
+    "length_fraction": 0.07,
+    "position": "bottom-right",
+    "color": "white",
+    "linewidth_px": 1.5,
+    "font_px": 16,
+    "tick_fraction": 0.05
   }
 }

@@ -1,21 +1,20 @@
 # config.py
 
 import json
-from pathlib import Path
-from typing import Union
 import logging
 from logging.handlers import RotatingFileHandler
+from pathlib import Path
+from typing import Union
 
 # Standard-Pfade
-BASE_DIR = Path(__file__).parent.resolve()
-DEFAULT_CONFIG_PATH = BASE_DIR / "config.json"
-
+BASE_DIR             = Path(__file__).parent.resolve()
+DEFAULT_CONFIG_PATH  = BASE_DIR / "config.json"
 
 def setup_logging(log_cfg: dict):
-    """Initialisiert das Logging mit RotatingFileHandler"""
-    level = log_cfg.get("level", "INFO").upper()
-    log_file = log_cfg.get("file", "app.log")
-    max_bytes = log_cfg.get("maxBytes", 5 * 1024 * 1024)
+    """Initialisiert das Logging mit RotatingFileHandler."""
+    level        = log_cfg.get("level", "INFO").upper()
+    log_file     = log_cfg.get("file", "app.log")
+    max_bytes    = log_cfg.get("maxBytes", 5 * 1024 * 1024)
     backup_count = log_cfg.get("backupCount", 3)
 
     log_path = Path(log_file)
@@ -27,19 +26,21 @@ def setup_logging(log_cfg: dict):
         filename=str(log_path),
         maxBytes=max_bytes,
         backupCount=backup_count,
-        encoding='utf-8'
+        encoding="utf-8"
     )
     handler.setFormatter(logging.Formatter(
-        '%(asctime)s %(levelname)s [%(name)s] %(message)s'
+        "%(asctime)s %(levelname)s [%(name)s] %(message)s"
     ))
 
-    logger = logging.getLogger()
-    logger.setLevel(getattr(logging, level))
-    logger.addHandler(handler)
-
+    root = logging.getLogger()
+    root.setLevel(getattr(logging, level))
+    root.addHandler(handler)
 
 def load_config(path: Union[str, Path] = None) -> dict:
-    """Lädt die Konfiguration und initialisiert Logging"""
+    """
+    Lädt die Konfiguration von disk,
+    initialisiert Logging und gibt das Dict zurück.
+    """
     cfg_path = Path(path) if path else DEFAULT_CONFIG_PATH
     if not cfg_path.is_absolute():
         cfg_path = BASE_DIR / cfg_path
@@ -49,10 +50,15 @@ def load_config(path: Union[str, Path] = None) -> dict:
 
     config = json.loads(cfg_path.read_text(encoding="utf-8"))
 
+    # Logging-Bereich in config sicherstellen und initialisieren
     log_cfg = config.setdefault("logging", {})
     log_cfg["level"] = log_cfg.get("level", "INFO").upper()
-
-    # Logging initialisieren
     setup_logging(log_cfg)
 
     return config
+
+# einmaliges Laden der config beim Import
+CONFIG = load_config()
+
+# Scalebar-Parameter global verfügbar machen
+SCALER = CONFIG.get("scalebar", {})

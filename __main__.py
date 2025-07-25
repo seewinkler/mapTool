@@ -14,7 +14,7 @@ from cli import (
     choose_dimensions,
     choose_scalebar_option,
     choose_background_option,
-    choose_export_formats    
+    choose_export_formats,
 )
 from io_utils import find_gpkg_files
 from layer_selector import get_layers_interactive
@@ -37,10 +37,12 @@ def main():
     handlers = [RichHandler(rich_tracebacks=True)]
     if logfile := config.get("logging", {}).get("file"):
         fh = logging.FileHandler(logfile, encoding="utf-8")
-        fh.setFormatter(logging.Formatter(
-            "%(asctime)s | %(levelname)s | %(message)s",
-            datefmt="%H:%M:%S",
-        ))
+        fh.setFormatter(
+            logging.Formatter(
+                "%(asctime)s | %(levelname)s | %(message)s",
+                datefmt="%H:%M:%S",
+            )
+        )
         handlers.append(fh)
 
     logging.basicConfig(
@@ -69,12 +71,14 @@ def main():
         breite_px, hoehe_px = choose_dimensions(spezialmodus, config)
 
         # 7) Scalebar konfigurieren
-        scalebar_cfg = config.get("scalebar", {"show": True, "position": "bottom-left"})
+        scalebar_cfg = config.get("scalebar", {})
         if spezialmodus:
             scalebar_cfg = choose_scalebar_option()
-            
-       # 7) Background-Konfiguration
-        background_cfg = config.get("background", {"color":"#2896BA","transparent":False})
+
+        # 7) Background-Konfiguration
+        background_cfg = config.get(
+            "background", {"color": "#2896BA", "transparent": False}
+        )
         if spezialmodus:
             background_cfg = choose_background_option()
 
@@ -134,6 +138,8 @@ def main():
                 bbox,
                 breite_px,
                 hoehe_px,
+                src_crs=ziel_crs,
+                label_text=None,
                 scalebar_cfg=scalebar_cfg,
                 background_cfg=background_cfg,
                 linien_cfg=config.get("linien"),

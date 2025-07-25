@@ -17,6 +17,8 @@ def plot_map(
     bbox: tuple,
     width_px: int,
     height_px: int,
+    src_crs,
+    label_text: str = None,
     scalebar_cfg: dict = None,
     background_cfg: dict = None,
     linien_cfg: dict = None  # 👈 NEU: Linienkonfiguration
@@ -84,17 +86,15 @@ def plot_map(
     # Scalebar
     if scalebar_cfg and scalebar_cfg.get("show", False):
         extent = [*ax.get_xlim(), *ax.get_ylim()]
-        add_scalebar(
-            ax,
-            extent,
-            src_crs=haupt_gdf.crs,
-            length_fraction=scalebar_cfg.get("length_fraction", 0.1),
-            position=scalebar_cfg.get("position", "bottom-left"),
-            show=True,
-            color=scalebar_cfg.get("color", "white"),
-            linewidth=scalebar_cfg.get("linewidth", 1.5),
-            fontsize=scalebar_cfg.get("fontsize", 8)
-        )
+
+    # src_crs kommt als Parameter in plot_map rein,
+    # label_text ist optional (None → automatische Label-Erzeugung)
+    add_scalebar(
+        ax,
+        extent,
+        src_crs,
+        label=label_text
+    )
 
     return fig, ax
 
