@@ -634,3 +634,7 @@ TypeError: save_map() takes 4 positional arguments but 7 were given
 2025-07-25 10:44:20,018 INFO [mymaptool.plotting] Karte gespeichert: d:\Gotti\Code\mapTool\output\nordamerika_EPSG_2163_2025-07-25_10-44-17.png
 2025-07-25 10:44:25,491 INFO [mymaptool.plotting] Karte gespeichert: d:\Gotti\Code\mapTool\output\nordamerika_EPSG_3857_2025-07-25_10-44-23.png
 2025-07-25 10:44:25,506 INFO [mymaptool.main] Alle Karten wurden erfolgreich erstellt.
+2025-07-25 10:47:42,711 INFO [mymaptool.cli] Spezialmodus: Verwende benutzerdefinierte Größe 1280×720 px.
+2025-07-25 10:47:54,425 INFO [mymaptool.plotting] Karte gespeichert: d:\Gotti\Code\mapTool\output\nordamerika_EPSG_2163_2025-07-25_10-47-53.png
+2025-07-25 10:47:57,970 INFO [mymaptool.plotting] Karte gespeichert: d:\Gotti\Code\mapTool\output\nordamerika_EPSG_3857_2025-07-25_10-47-56.png
+2025-07-25 10:47:57,977 INFO [mymaptool.main] Alle Karten wurden erfolgreich erstellt.
