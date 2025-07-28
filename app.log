@@ -16641,3 +16641,21 @@ TypeError: add_scalebar() missing 1 required positional argument: 'src_crs'
 2025-07-25 22:00:03,540 INFO [mymaptool.plotting] Karte gespeichert: d:\Gotti\Code\mapTool\output\nordamerika_EPSG_3857_2025-07-25_22-00-00.png
 2025-07-25 22:00:03,556 INFO [mymaptool.main] Alle Karten wurden erfolgreich erstellt.
 2025-07-25 22:00:03,556 INFO [mymaptool.main] Alle Karten wurden erfolgreich erstellt.
+2025-07-26 14:55:09,932 DEBUG [fiona.session] Could not import boto3, continuing with reduced functionality.
+2025-07-26 14:55:09,932 DEBUG [fiona.env] GDAL data found in package: path='C:\\Python312\\Lib\\site-packages\\fiona\\gdal_data'.
+2025-07-26 14:55:09,932 DEBUG [fiona.env] PROJ data found in package: path='C:\\Python312\\Lib\\site-packages\\fiona\\proj_data'.
+2025-07-26 14:55:09,982 DEBUG [fiona._env] GDAL data found in package: path='C:\\Python312\\Lib\\site-packages\\fiona\\gdal_data'.
+2025-07-26 14:55:09,982 DEBUG [fiona._env] PROJ data found in package: path='C:\\Python312\\Lib\\site-packages\\fiona\\proj_data'.
+2025-07-26 14:55:10,166 DEBUG [matplotlib] matplotlib data path: C:\Python312\Lib\site-packages\matplotlib\mpl-data
+2025-07-26 14:55:10,166 DEBUG [matplotlib] CONFIGDIR=C:\Users\gotti\.matplotlib
+2025-07-26 14:55:10,166 DEBUG [matplotlib] interactive is False
+2025-07-26 14:55:10,166 DEBUG [matplotlib] platform is win32
+2025-07-26 14:55:10,216 DEBUG [matplotlib] CACHEDIR=C:\Users\gotti\.matplotlib
+2025-07-26 14:56:10,911 INFO [mymaptool.cli] Spezialmodus: Verwende benutzerdefinierte Größe 1280×720 px.
+2025-07-26 14:56:10,911 INFO [mymaptool.cli] Spezialmodus: Verwende benutzerdefinierte Größe 1280×720 px.
+2025-07-26 14:56:40,656 DEBUG [fiona._env] GDAL data found in package: path='C:\\Python312\\Lib\\site-packages\\fiona\\gdal_data'.
+2025-07-26 14:56:40,656 DEBUG [fiona._env] GDAL data found in package: path='C:\\Python312\\Lib\\site-packages\\fiona\\gdal_data'.
+2025-07-26 14:56:40,656 DEBUG [fiona._env] PROJ data found in package: path='C:\\Python312\\Lib\\site-packages\\fiona\\proj_data'.
+2025-07-26 14:56:40,656 DEBUG [fiona._env] PROJ data found in package: path='C:\\Python312\\Lib\\site-packages\\fiona\\proj_data'.
+2025-07-26 14:57:40,007 DEBUG [mymaptool.main] Ausgeblendete Regionen: set()
+2025-07-26 14:57:40,007 DEBUG [mymaptool.main] Ausgeblendete Regionen: set()
